@@ -2,15 +2,15 @@ import csv
 import math
 import numpy as np
 
-def leer_archivo_csv(nombre_archivo):
+def cargarArchivo(filename):
     matriz = []
-    with open(nombre_archivo, 'r') as archivo:
-        lector_csv = csv.reader(archivo, delimiter=';')
-        for fila in lector_csv:
+    with open(filename, 'r') as file:
+        readCsv = csv.reader(file, delimiter=';')
+        for fila in readCsv:
             matriz.append(fila)
     return matriz
 
-def calcular_media(matriz):
+def calcMean(matriz):
     num_filas = len(matriz)
     num_columnas = len(matriz[0])
     medias = []
@@ -20,32 +20,54 @@ def calcular_media(matriz):
         medias.append(media_columna)
     return medias
 
-def calcular_desviacion_estandar(matriz):
-    medias_columnas = calcular_media(matriz)
+def calcStdDev(matriz):
+    meanColumnas = calcMean(matriz)
     num_filas = len(matriz)
     num_columnas = len(matriz[0])
-    desviaciones_estandar = []
+    stdDeviations = []
     for j in range(num_columnas):
-        suma_cuadrados = sum((matriz[i][j] - medias_columnas[j]) ** 2 for i in range(num_filas))
-        desviacion_estandar_columna = math.sqrt(suma_cuadrados / num_filas)
-        desviaciones_estandar.append(desviacion_estandar_columna)
-    return desviaciones_estandar
+        sumSquares = sum((matriz[i][j] - meanColumnas[j]) ** 2 for i in range(num_filas))
+        columns_StdDev = math.sqrt(sumSquares / num_filas)
+        stdDeviations.append(columns_StdDev)
+    return stdDeviations
 
-def centrar_y_reducir(matriz):
+def centrarReducir(matriz):
     datos = []
     for fila in matriz[1:]:
-        fila_numerica = [float(valor.replace(',', '.')) for valor in fila[1:]]
-        datos.append(fila_numerica)
-    matriz_numerica = np.array(datos)
-    medias = calcular_media(matriz_numerica)
-    desviaciones_estandar = calcular_desviacion_estandar(matriz_numerica)
-    matriz_centralizada_reducida = (matriz_numerica - medias) / desviaciones_estandar
-    return matriz_centralizada_reducida
+        filaDecimales = [float(valor.replace(',', '.')) for valor in fila[1:]]
+        datos.append(filaDecimales)
+    matrizDecimales = np.array(datos)
+    means = calcMean(matrizDecimales)
+    stdDeviations = calcStdDev(matrizDecimales)
+    matrizCentradaReducida = (matrizDecimales - means) / stdDeviations
+    return matrizCentradaReducida
 
-nombre_archivo = 'EjemploEstudiantes.csv'
-matriz_datos = leer_archivo_csv(nombre_archivo)
+import numpy as np
 
-matriz_centralizada_reducida = centrar_y_reducir(matriz_datos)
+def calcCorrelaciones(columnOne, columnTwo):
+    meansOne = np.mean(columnOne)
+    meansTwo = np.mean(columnTwo)
+    numerador = np.sum((columnOne - meansOne) * (columnTwo - meansTwo))
+    denominador = np.sqrt(np.sum((columnOne - meansOne)**2)) * np.sqrt(np.sum((columnTwo - meansTwo)**2))
+    correlacionSend = numerador / denominador
+    return correlacionSend
 
-print("Matriz centrada y reducida:")
-print(matriz_centralizada_reducida)
+def calcMatrizCorrelaciones(matrizCentradaReducida):
+    n = len(matrizCentradaReducida[0])
+    matrizCorrelaciones = np.zeros((n, n))
+    for i in range(n):
+        for j in range(n):
+            r = calcCorrelaciones(matrizCentradaReducida[:, i], matrizCentradaReducida[:, j])
+            matrizCorrelaciones[i, j] = r
+    return matrizCorrelaciones
+
+filename = 'EjemploEstudiantes.csv'
+matrizRaw = cargarArchivo(filename)
+
+matrizCentradaReducida = centrarReducir(matrizRaw)
+matriz_correlaciones = calcMatrizCorrelaciones(matrizCentradaReducida)
+
+print("\nMatriz Centrada y Reducida:")
+print(matrizCentradaReducida)
+print("\nMatriz de Correlaciones:")
+print(matriz_correlaciones)
