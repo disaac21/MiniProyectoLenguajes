@@ -42,8 +42,6 @@ def centrarReducir(matriz):
     matrizCentradaReducida = (matrizDecimales - means) / stdDeviations
     return matrizCentradaReducida
 
-import numpy as np
-
 def calcCorrelaciones(columnOne, columnTwo):
     meansOne = np.mean(columnOne)
     meansTwo = np.mean(columnTwo)
@@ -61,13 +59,40 @@ def calcMatrizCorrelaciones(matrizCentradaReducida):
             matrizCorrelaciones[i, j] = r
     return matrizCorrelaciones
 
+def calcValoresPropios(matrizCorrelaciones):
+    valoresPropios = np.linalg.eigvals(matrizCorrelaciones)
+    return valoresPropios
+
+def calcVectoresPropios(matrizCorrelaciones):
+    vectoresPropios = np.linalg.eig(matrizCorrelaciones)
+    return vectoresPropios
+
+def orderValoresPropios(valoresPropios):
+    orderedValoresPropios = valoresPropios
+    for i in range(len(orderedValoresPropios)):
+        for j in range(i+1, len(orderedValoresPropios)):
+            if orderedValoresPropios[i] < orderedValoresPropios[j]:
+                orderedValoresPropios[i], orderedValoresPropios[j] = orderedValoresPropios[j], orderedValoresPropios[i]
+    return orderedValoresPropios
+
+def orderVectoresPropios(vectoresPropios, orderedValoresPropios):
+    indexes = np.argsort(orderedValoresPropios)[::-1]
+    orderedVectoresPropios = vectoresPropios[:, indexes]
+    return orderedVectoresPropios
+
 filename = 'EjemploEstudiantes.csv'
 matrizRaw = cargarArchivo(filename)
 
 matrizCentradaReducida = centrarReducir(matrizRaw)
-matriz_correlaciones = calcMatrizCorrelaciones(matrizCentradaReducida)
+matrizCorrelaciones = calcMatrizCorrelaciones(matrizCentradaReducida)
+
+ValoresPropios = calcValoresPropios(matrizCorrelaciones)
+VectoresPropios = calcVectoresPropios(matrizCorrelaciones)
+
+OrdenadosValoresPropios = orderValoresPropios(ValoresPropios)
+OrdenadosVectoresPropios = orderVectoresPropios(VectoresPropios, OrdenadosValoresPropios)
 
 print("\nMatriz Centrada y Reducida:")
 print(matrizCentradaReducida)
 print("\nMatriz de Correlaciones:")
-print(matriz_correlaciones)
+print(matrizCorrelaciones)
