@@ -97,6 +97,22 @@ def calcMatrizComponentesPrincipales(centradaReducida, matrizV):
 
     return matrizComponentesPrincipales
 
+#Calculo de Matriz de Calidades de Individuos
+def calcMatrizCalidadesIndividuos(matrizComponentesPrincipales, matrizCentradaReducida):
+    listaMatrizCalidadesIndividuos = []
+    rowCount = len(matrizComponentesPrincipales)
+    columnCount = len(matrizComponentesPrincipales[0])
+    
+    for i in range(rowCount):
+        fila = []
+        for j in range(columnCount):
+            num = matrizComponentesPrincipales[i][j] ** 2
+            den = sum(matrizCentradaReducida[i][k] ** 2 for k in range(columnCount))
+            fila.append(num / den)
+        listaMatrizCalidadesIndividuos.append(fila)
+    
+    matrizCalidadesIndividuos = np.array(listaMatrizCalidadesIndividuos)
+    return matrizCalidadesIndividuos
 
 # Main ----------     ----------     ----------     ----------     ----------
 
@@ -125,6 +141,9 @@ matrizV = OrdenadosVectoresPropios
 #Calculo de Matriz de Componentes Principales
 matrizComponentesPrincipales = calcMatrizComponentesPrincipales(matrizCentradaReducida, matrizV)
 
+#Calculo de Matriz de Calidades de Individuos
+matrizCalidadesIndividuos = calcMatrizCalidadesIndividuos(matrizComponentesPrincipales, matrizCentradaReducida)
+
 print("\nMatriz Centrada y Reducida:")
 print(matrizCentradaReducida)
 print("\nMatriz de Correlaciones:")
@@ -142,4 +161,8 @@ print()
 
 print("Matriz de Componentes Principales:")
 print(matrizComponentesPrincipales)
+print()
+
+print("Matriz de Calidades de Individuos:")
+print(matrizCalidadesIndividuos)
 print()
