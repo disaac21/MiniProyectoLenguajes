@@ -2,6 +2,7 @@ import csv
 import math
 import numpy as np
 
+#Cargar Archivo y Crear Matriz
 def cargarArchivo(filename):
     matriz = []
     with open(filename, 'r') as file:
@@ -10,6 +11,7 @@ def cargarArchivo(filename):
             matriz.append(fila)
     return matriz
 
+#Centrar y Reducir
 def calcMean(matriz):
     num_filas = len(matriz)
     num_columnas = len(matriz[0])
@@ -42,6 +44,7 @@ def centrarReducir(matriz):
     matrizCentradaReducida = (matrizDecimales - means) / stdDeviations
     return matrizCentradaReducida
 
+#Calculo de Matriz de Correlaciones
 def calcCorrelaciones(columnOne, columnTwo):
     meansOne = np.mean(columnOne)
     meansTwo = np.mean(columnTwo)
@@ -59,14 +62,16 @@ def calcMatrizCorrelaciones(matrizCentradaReducida):
             matrizCorrelaciones[i, j] = r
     return matrizCorrelaciones
 
+#Calculo de Valores y Vectores Propios
 def calcValoresPropios(matrizCorrelaciones):
     valoresPropios = np.linalg.eigvals(matrizCorrelaciones)
     return valoresPropios
 
 def calcVectoresPropios(matrizCorrelaciones):
-    vectoresPropios = np.linalg.eig(matrizCorrelaciones)
+    _, vectoresPropios = np.linalg.eig(matrizCorrelaciones)
     return vectoresPropios
 
+#Ordenamiento de Valores y Vectores Propios & Construccion de Matriz V
 def orderValoresPropios(valoresPropios):
     orderedValoresPropios = valoresPropios
     for i in range(len(orderedValoresPropios)):
@@ -80,19 +85,61 @@ def orderVectoresPropios(vectoresPropios, orderedValoresPropios):
     orderedVectoresPropios = vectoresPropios[:, indexes]
     return orderedVectoresPropios
 
+#Calculo de Matriz de Componentes Principales
+def calcMatrizComponentesPrincipales(centradaReducida, matrizV):
+    filas_CR, columnas_CR = centradaReducida.shape
+    filas_V, columnas_V = matrizV.shape
+
+    matrizComponentesPrincipales = np.zeros((filas_CR, columnas_V))
+
+    for i in range(filas_CR):
+        matrizComponentesPrincipales[i] = np.dot(centradaReducida[i], matrizV)
+
+    return matrizComponentesPrincipales
+
+
+# Main ----------     ----------     ----------     ----------     ----------
+
+#Cargar Archivo y Crear Matriz
 filename = 'EjemploEstudiantes.csv'
 matrizRaw = cargarArchivo(filename)
 
-matrizCentradaReducida = centrarReducir(matrizRaw)
+#Centrar y Reducir
+matrizCentradaReducida = centrarReducir(matrizRaw) 
+
+#Calculo de Matriz de Correlaciones
 matrizCorrelaciones = calcMatrizCorrelaciones(matrizCentradaReducida)
 
+#Calculo de Valores y Vectores Propios
 ValoresPropios = calcValoresPropios(matrizCorrelaciones)
 VectoresPropios = calcVectoresPropios(matrizCorrelaciones)
 
+#Ordenamiento de Valores y Vectores Propios
 OrdenadosValoresPropios = orderValoresPropios(ValoresPropios)
 OrdenadosVectoresPropios = orderVectoresPropios(VectoresPropios, OrdenadosValoresPropios)
+
+#Construccion de Matriz V
+# matrizV = np.column_stack([columna for columna in OrdenadosVectoresPropios.T])
+matrizV = OrdenadosVectoresPropios
+
+#Calculo de Matriz de Componentes Principales
+matrizComponentesPrincipales = calcMatrizComponentesPrincipales(matrizCentradaReducida, matrizV)
 
 print("\nMatriz Centrada y Reducida:")
 print(matrizCentradaReducida)
 print("\nMatriz de Correlaciones:")
 print(matrizCorrelaciones)
+print()
+
+for i in range(len(OrdenadosValoresPropios)):
+    print("Valor propio:", OrdenadosValoresPropios[i])
+    print("Vector propio:", OrdenadosVectoresPropios[:, i])
+    print()
+
+print("Matriz V:")
+print(matrizV)
+print()
+
+print("Matriz de Componentes Principales:")
+print(matrizComponentesPrincipales)
+print()
