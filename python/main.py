@@ -144,25 +144,26 @@ matrizComponentesPrincipales = calcMatrizComponentesPrincipales(matrizCentradaRe
 #Calculo de Matriz de Calidades de Individuos
 matrizCalidadesIndividuos = calcMatrizCalidadesIndividuos(matrizComponentesPrincipales, matrizCentradaReducida)
 
-print("\nMatriz Centrada y Reducida:")
+print("\nPaso 1 - Matriz Centrada y Reducida:")
 print(matrizCentradaReducida)
-print("\nMatriz de Correlaciones:")
+print("\nPaso 2 - Matriz de Correlaciones:")
 print(matrizCorrelaciones)
 print()
 
+print("\nPaso 3 - Valores y Vectores Propios:")
 for i in range(len(OrdenadosValoresPropios)):
     print("Valor propio:", OrdenadosValoresPropios[i])
     print("Vector propio:", OrdenadosVectoresPropios[:, i])
     print()
 
-print("Matriz V:")
+print("Paso 4 - Matriz V:")
 print(matrizV)
 print()
 
-print("Matriz de Componentes Principales:")
+print("Paso 5 - Matriz de Componentes Principales:")
 print(matrizComponentesPrincipales)
 print()
 
-print("Matriz de Calidades de Individuos:")
+print("Paso 6 - Matriz de Calidades de Individuos:")
 print(matrizCalidadesIndividuos)
 print()
