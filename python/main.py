@@ -114,6 +114,26 @@ def calcMatrizCalidadesIndividuos(matrizComponentesPrincipales, matrizCentradaRe
     matrizCalidadesIndividuos = np.array(listaMatrizCalidadesIndividuos)
     return matrizCalidadesIndividuos
 
+#Calculo de Matriz de Coordenadas de las Variables
+def calcMatrizCoordenadasVariables(centradaReducida, vectoresPropios):
+    matrizCoordenadasVariables = np.dot(centradaReducida, vectoresPropios.T)
+    return matrizCoordenadasVariables
+
+#Calculo de Matriz de Calidades de las Variables
+def calcMatrizCalidadesVariables(valoresPropios, entries):
+    matrizCalidadesVariables = valoresPropios / entries
+    return matrizCalidadesVariables
+
+#Calculo de Vector de Inercias de los Ejes
+def calcVectorInerciasEjes(valoresPropios):
+    vectorInerciasEjes = np.array([])
+    den = len(valoresPropios)
+    for i in range(len(valoresPropios)):
+        num = valoresPropios[i] * 100
+        value = num/den
+        vectorInerciasEjes = np.append(vectorInerciasEjes, value)
+    return vectorInerciasEjes
+
 # Main ----------     ----------     ----------     ----------     ----------
 
 #Cargar Archivo y Crear Matriz
@@ -135,7 +155,6 @@ OrdenadosValoresPropios = orderValoresPropios(ValoresPropios)
 OrdenadosVectoresPropios = orderVectoresPropios(VectoresPropios, OrdenadosValoresPropios)
 
 #Construccion de Matriz V
-# matrizV = np.column_stack([columna for columna in OrdenadosVectoresPropios.T])
 matrizV = OrdenadosVectoresPropios
 
 #Calculo de Matriz de Componentes Principales
@@ -143,6 +162,15 @@ matrizComponentesPrincipales = calcMatrizComponentesPrincipales(matrizCentradaRe
 
 #Calculo de Matriz de Calidades de Individuos
 matrizCalidadesIndividuos = calcMatrizCalidadesIndividuos(matrizComponentesPrincipales, matrizCentradaReducida)
+
+#Calculo de Matriz de Coordenadas de las Variables
+matrizCoordenadasVariables = calcMatrizCoordenadasVariables(matrizCentradaReducida, OrdenadosVectoresPropios)
+
+#Calculo de Matriz de Calidades de las Variables
+matrizCalidadesVariables = calcMatrizCalidadesVariables(OrdenadosValoresPropios, len(matrizCentradaReducida))
+
+#Calculo de Vector de Inercias de los Ejes
+vectorInerciasEjes = calcVectorInerciasEjes(OrdenadosValoresPropios)
 
 print("\nPaso 1 - Matriz Centrada y Reducida:")
 print(matrizCentradaReducida)
@@ -166,4 +194,16 @@ print()
 
 print("Paso 6 - Matriz de Calidades de Individuos:")
 print(matrizCalidadesIndividuos)
+print()
+
+print("Paso 7 - Matriz de Coordenadas de las Variables:")
+print(matrizCoordenadasVariables)
+print()
+
+print("Paso 8 - Matriz de Calidades de las Variables:")
+print(matrizCalidadesVariables)
+print()
+
+print("Paso 9 - Vector de Inercias de los Ejes:")
+print(vectorInerciasEjes)
 print()
