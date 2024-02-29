@@ -1,6 +1,7 @@
 import csv
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 
 #Cargar Archivo y Crear Matriz
 def cargarArchivo(filename):
@@ -90,11 +91,12 @@ def calcMatrizComponentesPrincipales(centradaReducida, matrizV):
     filas_CR, columnas_CR = centradaReducida.shape
     filas_V, columnas_V = matrizV.shape
 
-    matrizComponentesPrincipales = np.zeros((filas_CR, columnas_V))
+    matrizComponentesPrincipalesTemp = np.zeros((filas_CR, columnas_V))
 
     for i in range(filas_CR):
-        matrizComponentesPrincipales[i] = np.dot(centradaReducida[i], matrizV)
+        matrizComponentesPrincipalesTemp[i] = np.dot(centradaReducida[i], matrizV)
 
+    matrizComponentesPrincipales = matrizComponentesPrincipalesTemp[:, :2]
     return matrizComponentesPrincipales
 
 #Calculo de Matriz de Calidades de Individuos
@@ -133,6 +135,24 @@ def calcVectorInerciasEjes(valoresPropios):
         value = num/den
         vectorInerciasEjes = np.append(vectorInerciasEjes, value)
     return vectorInerciasEjes
+
+#Extrae Headings
+def fileHeadings(filename):
+    with open(filename, 'r', newline='') as file:
+        readCsv = csv.reader(file, delimiter=';')
+        linea = next(readCsv)
+    linea = linea[1:]
+    return linea
+
+#Extrae Nombres
+def fileNames(filename):
+    names = []
+    with open(filename, 'r', newline='') as file:
+        readCsv = csv.reader(file, delimiter=';')
+        next(readCsv)
+        for row in readCsv:
+            names.append(row[0])
+    return names
 
 # Main ----------     ----------     ----------     ----------     ----------
 
@@ -207,3 +227,45 @@ print()
 print("Paso 9 - Vector de Inercias de los Ejes:")
 print(vectorInerciasEjes)
 print()
+
+# Circular Graph ----------     ----------     ----------     ----------     ----------
+
+arrowHeads = fileHeadings(filename)
+
+fig, ax = plt.subplots(figsize=(8, 8))
+ax.set_xlim(-1.1, 1.1)
+ax.set_ylim(-1.1, 1.1)
+ax.axhline(0, color='gray', linewidth=2, linestyle='dotted', dashes=(3, 3))
+ax.axvline(0, color='gray', linewidth=2, linestyle='dotted', dashes=(3, 3))
+
+circle = plt.Circle((0, 0), 1, color='orange', fill=False)
+ax.add_artist(circle)
+
+for i, var in enumerate(arrowHeads):
+    ax.arrow(0, 0, OrdenadosVectoresPropios[i][0], OrdenadosVectoresPropios[i][1], head_width=0.05, head_length=0.05, fc='orange', ec='orange')
+    ax.text(OrdenadosVectoresPropios[i][0]*1.15, OrdenadosVectoresPropios[i][1]*1.15, var, color='black', ha='center', va='center')
+
+plt.title("Círculo de Correlación")
+plt.xlabel("Componente 1")
+plt.ylabel("Componente 2")
+plt.grid(True)
+plt.show()
+
+# Regular Graph ----------     ----------     ----------     ----------     ----------
+
+nameLabels = fileNames(filename)
+
+x = matrizComponentesPrincipales[:, 0]
+y = matrizComponentesPrincipales[:, 1]
+
+fig, ax = plt.subplots(figsize=(10, 10))
+ax.scatter(x, y, color='blue')
+
+for i, nombre in enumerate(nameLabels):
+    ax.text(x[i], y[i], nombre, fontsize=9)
+
+ax.set_title("Plano Principal")
+ax.set_xlabel("Componente 1")
+ax.set_ylabel("Componente 2")
+ax.grid(True)
+plt.show()
