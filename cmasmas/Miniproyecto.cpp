@@ -4,6 +4,7 @@
 #include <string>
 #include "eigen-3.4.0/Eigen/Dense"
 #include "eigen-3.4.0/Eigen/Eigenvalues"
+#include <iomanip>
 
 using Eigen::Matrix3d;
 using namespace std;
@@ -66,12 +67,12 @@ int main()
     double matriz[filas][columnas], media[columnas], desvEstandar[columnas];
     for (int i = 0; i < filas; i++)
     {
-        getline(archivo, linea);
+        getline(archivo, linea); // agarra toda la linea
         stringstream filaStream(linea);
         string valor = "";
 
         // Omitir la primera columna (nombre del alumno)
-        getline(filaStream, valor, delimitador);
+        getline(filaStream, valor, delimitador); // lee la linea que agarramos antes
 
         // cout << "columnas: " << columnas << endl;
 
@@ -85,13 +86,16 @@ int main()
                 {
                     c = '.';
                 }
-                matriz[i][j] = stod(valor);
-                media[j] += stod(valor);
             }
-            cout << matriz[i][j] << " ";
+            matriz[i][j] = stod(valor);
+            media[j] += stod(valor);
+            cout << setw(5) << matriz[i][j];
         }
         cout << endl;
     }
+
+    cout << endl
+         << "Media[0]: " << media[0] << endl;
 
     // Calcular media y desv. estandar de cada variable
     // y obtener la transpuesta de la matriz original
@@ -147,6 +151,33 @@ int main()
     // Obtener matriz de componentes principales (normalizada x eigenvetores)
     // Eigen::MatrixXd compPrincipales = normalizada * eigenvectores;
 
+    cout << "media" << endl;
+    for (int i = 0; i < columnas; i++)
+    {
+        cout << media[i] << " ";
+    }
+
+    cout << endl
+         << "centrada" << endl;
+    double centrada[filas][columnas];
+    for (int i = 0; i < filas; i++)
+    {
+        for (int j = 0; j < columnas; j++)
+        {
+            centrada[i][j] = matriz[i][j] - media[j];
+            cout << centrada[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << endl
+         << "reducida con desviacion estandar" << endl;
+
+    cout << "desvEstandar" << endl;
+    for (int i = 0; i < columnas; i++)
+    {
+        cout << desvEstandar[i] << " ";
+    }
     archivo.close();
     return 0;
 }
