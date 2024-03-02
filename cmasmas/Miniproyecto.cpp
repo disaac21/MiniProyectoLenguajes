@@ -282,6 +282,11 @@ int main()
     }
     cout << C << endl;
 
+    cout << "Paso 6:" << endl;
+    Eigen::MatrixXd Q = C * correlacion.transpose();
+    cout << "Matriz de calidades de individuos (Q):" << endl;
+    cout << Q << endl;
+
     archivo.close();
     return 0;
 }
