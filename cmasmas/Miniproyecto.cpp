@@ -87,15 +87,23 @@ int main()
                     c = '.';
                 }
             }
-            matriz[i][j] = stod(valor);
-            media[j] += stod(valor);
-            cout << setw(5) << matriz[i][j];
+            try
+            {
+                matriz[i][j] = stod(valor);
+                media[j] += stod(valor);
+                // cout << endl << "media[" << j << "]: " << media[j] << " ";
+                cout << setw(5) << matriz[i][j];
+            }
+            catch (const std::invalid_argument& e)
+            {
+                // Handle invalid input
+                cout << "Invalid input: " << valor << endl;
+            }
         }
         cout << endl;
     }
 
-    cout << endl
-         << "Media[0]: " << media[0] << endl;
+    // cout << endl << "Media[0]: " << media[0] << endl;
 
     // Calcular media y desv. estandar de cada variable
     // y obtener la transpuesta de la matriz original
@@ -151,11 +159,12 @@ int main()
     // Obtener matriz de componentes principales (normalizada x eigenvetores)
     // Eigen::MatrixXd compPrincipales = normalizada * eigenvectores;
 
-    cout << "media" << endl;
+    cout << "medias" << endl;
     for (int i = 0; i < columnas; i++)
     {
         cout << media[i] << " ";
     }
+    cout << endl;
 
     cout << endl
          << "centrada" << endl;
@@ -165,7 +174,8 @@ int main()
         for (int j = 0; j < columnas; j++)
         {
             centrada[i][j] = matriz[i][j] - media[j];
-            cout << centrada[i][j] << " ";
+            // cout << centrada[i][j] << " ";
+            cout << matriz[i][j]<< " ";
         }
         cout << endl;
     }
