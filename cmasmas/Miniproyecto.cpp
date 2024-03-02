@@ -298,6 +298,40 @@ int main()
     }
     cout << Q << endl;
 
+    // Paso 7: Calcular la matriz de coordenadas de las variables T
+    cout << "Paso 7 :" << endl;
+    cout << "Matriz de coordenadas de las variables T :" << endl;
+    Eigen::MatrixXd T(filas, columnas); // Crear una matriz para almacenar el resultado
+
+    // Multiplicación de la matriz normalizada por los vectores propios
+    for (int i = 0; i < filas; ++i)
+    {
+        for (int j = 0; j < columnas; ++j)
+        {
+            T(i, j) = 0;
+            for (int k = 0; k < columnas; ++k)
+            {
+                T(i, j) += normalizada(i, k) * V(k, j); // Calcular la matriz de coordenadas de las variables T
+            }
+        }
+    }
+    cout << T << endl;
+    cout << "Paso 8:" << endl;
+    cout << "Matriz de calidades de las variables S:" << endl;
+    Eigen::MatrixXd S(columnas, columnas); // Crear una matriz para almacenar el resultado
+    for (int i = 0; i < columnas; ++i)
+    {
+        for (int j = 0; j < columnas; ++j)
+        {
+            S(i, j) = 0;
+            for (int k = 0; k < filas; ++k)
+            {
+                S(i, j) += V(i, k) * V(j, k) * eigenvalues(k); // Calcular la matriz de calidades de las variables S
+            }
+        }
+    }
+    cout << S << endl;
+
     archivo.close();
     return 0;
 }
