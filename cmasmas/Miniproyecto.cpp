@@ -175,19 +175,31 @@ int main()
         {
             centrada[i][j] = matriz[i][j] - media[j];
             // cout << centrada[i][j] << " ";
-            cout << matriz[i][j]<< " ";
+            cout << setw(5) << matriz[i][j];
         }
         cout << endl;
     }
-
-    cout << endl
-         << "reducida con desviacion estandar" << endl;
 
     cout << "desvEstandar" << endl;
     for (int i = 0; i < columnas; i++)
     {
         cout << desvEstandar[i] << " ";
     }
+    cout << endl
+         << "reducida con desviacion estandar" << endl;
+    double reducida[filas][columnas];
+    for (int i = 0; i < filas; i++)
+    {
+        for (int j = 0; j < columnas; j++)
+        {
+            reducida[i][j] = centrada[i][j] / desvEstandar[j];
+            cout << reducida[i][j] << " ";
+            // cout << centrada[i][j] << " ";
+            // cout << setw(5) << matriz[i][j];
+        }
+        cout << endl;
+    }
+
     archivo.close();
     return 0;
 }
