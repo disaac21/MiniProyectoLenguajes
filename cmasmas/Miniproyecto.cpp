@@ -247,8 +247,8 @@ int main()
          << "medianas" << endl;
     for (size_t i = 0; i < columnas; i++)
     {
-        cout 
-             << medianas[i] << endl;
+        cout
+            << medianas[i] << endl;
     }
 
     Eigen::MatrixXd V(columnas, columnas); // Crear matriz V de tamaño m x m
@@ -263,8 +263,24 @@ int main()
     }
 
     // Imprimir la matriz V
-    cout << "Matriz V:" << endl;
+    cout << "Paso 4:" << endl;
     cout << V << endl;
+
+    cout << "Paso 5:" << endl;
+    Eigen::MatrixXd C(filas, columnas);
+
+    for (int i = 0; i < filas; ++i)
+    {
+        for (int j = 0; j < columnas; ++j)
+        {
+            C(i, j) = 0;
+            for (int k = 0; k < columnas; ++k)
+            {
+                C(i, j) += normalizada(i, k) * V(k, j);
+            }
+        }
+    }
+    cout << C << endl;
 
     archivo.close();
     return 0;
