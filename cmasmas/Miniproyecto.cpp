@@ -165,12 +165,12 @@ int main()
 
     for (size_t i = 0; i < eigenvectores.size(); i++)
     {
-        cout << "eigenvectores: " << eigenvectores(i) << endl;
+        // cout << "eigenvectores: " << eigenvectores(i) << endl;
     }
 
     for (size_t i = 0; i < eigenvalues.size(); i++)
     {
-        cout << "eigenvalues: " << eigenvalues(i) << endl;
+        // cout << "eigenvalues: " << eigenvalues(i) << endl;
     }
 
     // Obtener matriz de componentes principales (normalizada x eigenvetores)
@@ -193,7 +193,7 @@ int main()
         {
             centrada[i][j] = matriz[i][j] - media[j];
             // cout << centrada[i][j] << " ";
-            cout << setw(5) << matriz[i][j];
+            cout << setw(5) << matriz[i][j]; // aca esta el error
         }
         cout << endl;
     }
