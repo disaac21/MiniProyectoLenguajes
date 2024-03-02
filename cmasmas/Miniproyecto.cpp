@@ -151,7 +151,7 @@ int main()
         {
             correlacion(i, j) = 0.0;
             for (int k = 0; k < columnas; ++k)
-                correlacion(i, j) += matriz[i][k] * transpuesta[j][k];
+                correlacion(i, j) += (matriz[i][k] * transpuesta[j][k]);
             correlacion(i, j) /= filas;
             cout << setw(9) << correlacion(i, j);
         }
@@ -185,7 +185,7 @@ int main()
     cout << endl;
 
     cout << endl
-         << "centrada" << endl;
+         << "centrada (aca esta el error)" << endl;
     double centrada[filas][columnas];
     for (int i = 0; i < filas; i++)
     {
