@@ -110,31 +110,27 @@ int main()
 
     // Calcular media y desv. estandar de cada variable
     // y obtener la transpuesta de la matriz original
-    cout << "Transpuesta: " << endl;
     double transpuesta[columnas][filas];
     cout << endl;
+    cout << "Transpuesta: " << endl;
     for (int j = 0; j < columnas; j++)
     {
         media[j] /= filas;
         for (int i = 0; i < filas; i++)
         {
             desvEstandar[j] += pow((matriz[j][i] - media[j]), 2);
-            transpuesta[j][i] = matriz[i][j];
-            cout << transpuesta[j][i] << " ";
+            transpuesta[i][j] = matriz[i][j];
+            cout << transpuesta[i][j] << " ";
         }
         desvEstandar[j] /= filas;
         cout << endl;
     }
-
-    
-    
     // imprimirMatriz((double *)transpuesta, columnas, filas);
-
     // cout << endl << "prueba" << endl;
     // imprimirMatriz((double *)matriz, filas, columnas);
     
 
-    cout << endl
+     cout << endl
          << "Normalizada: " << endl;
     // Obtener matriz normalizada (centrada y reducida)
     Eigen::MatrixXd normalizada(filas, columnas);
@@ -148,7 +144,7 @@ int main()
         cout << endl;
     }
 
-    // Obtener matriz de correlación
+   // Obtener matriz de correlación
     cout << endl
          << "matriz de correlacion" << endl;
     Eigen::MatrixXd correlacion(filas, filas);
@@ -158,7 +154,7 @@ int main()
         {
             correlacion(i, j) = 0.0;
             for (int k = 0; k < columnas; ++k)
-                correlacion(i, j) += (matriz[i][k] * transpuesta[j][k]);
+                correlacion(i, j) += matriz[i][k] * transpuesta[j][k];
             correlacion(i, j) /= filas;
             cout << setw(9) << correlacion(i, j);
         }
@@ -357,7 +353,7 @@ int main()
     cout << endl;
 
     archivo.close();
-
+    /*
     //graficos
     ofstream datos("datos.dat");
     for (size_t i = 0; i < filas; ++i) {
@@ -377,6 +373,7 @@ int main()
     script.close();
 
     system("gnuplot -p grafico.gnu");
-    getchar();
+    
+    getchar();*/
     return 0;
 }
