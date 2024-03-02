@@ -318,7 +318,8 @@ int main()
     cout << T << endl;
     cout << "Paso 8:" << endl;
     cout << "Matriz de calidades de las variables S:" << endl;
-    Eigen::MatrixXd S(columnas, columnas); // Crear una matriz para almacenar el resultado
+    Eigen::MatrixXd S(columnas, columnas);
+
     for (int i = 0; i < columnas; ++i)
     {
         for (int j = 0; j < columnas; ++j)
@@ -326,11 +327,27 @@ int main()
             S(i, j) = 0;
             for (int k = 0; k < filas; ++k)
             {
-                S(i, j) += V(i, k) * V(j, k) * eigenvalues(k); // Calcular la matriz de calidades de las variables S
+                S(i, j) += pow(C(k, i), 2);
             }
+            S(i, j) /= filas;
+            cout << setw(9) << S(i, j);
         }
+        cout << endl;
     }
-    cout << S << endl;
+    cout << "Vector de inercias de los ejes I:" << endl;
+    Eigen::MatrixXd I(1, columnas);
+
+    for (int j = 0; j < columnas; ++j)
+    {
+        double suma = 0;
+        for (int i = 0; i < columnas; ++i)
+        {
+            suma += S(i, j);
+        }
+        I(0, j) = suma;
+        cout << setw(9) << I(0, j);
+    }
+    cout << endl;
 
     archivo.close();
     return 0;
