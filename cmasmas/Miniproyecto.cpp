@@ -193,7 +193,7 @@ int main()
         for (int j = 0; j < columnas; j++)
         {
             reducida[i][j] = centrada[i][j] / desvEstandar[j];
-            cout << reducida[i][j] << " ";
+            cout << setw(11) << reducida[i][j] << " ";
             // cout << centrada[i][j] << " ";
             // cout << setw(5) << matriz[i][j];
         }
