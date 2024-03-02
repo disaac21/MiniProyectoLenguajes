@@ -63,8 +63,9 @@ int main()
     getline(archivo, linea);
 
     // Llenar la matriz de datos originales
-    cout << endl << "matriz base " << endl;
-    double matriz[filas][columnas], media[columnas], desvEstandar[columnas];
+    cout << endl
+         << "matriz base " << endl;
+    double matriz[filas][columnas], media[columnas], desvEstandar[columnas], medianas[columnas];
     for (int i = 0; i < filas; i++)
     {
         getline(archivo, linea); // agarra toda la linea
@@ -94,7 +95,7 @@ int main()
                 // cout << endl << "media[" << j << "]: " << media[j] << " ";
                 cout << setw(5) << matriz[i][j];
             }
-            catch (const std::invalid_argument& e)
+            catch (const std::invalid_argument &e)
             {
                 // Handle invalid input
                 cout << "Invalid input: " << valor << endl;
@@ -139,6 +140,8 @@ int main()
     }
 
     // Obtener matriz de correlación
+    cout << endl
+         << "matriz de correlacion" << endl;
     Eigen::MatrixXd correlacion(filas, filas);
     for (int i = 0; i < filas; ++i)
     {
@@ -148,7 +151,9 @@ int main()
             for (int k = 0; k < columnas; ++k)
                 correlacion(i, j) += matriz[i][k] * transpuesta[j][k];
             correlacion(i, j) /= filas;
+            cout << setw(9) << correlacion(i, j);
         }
+        cout << endl;
     }
 
     // Realizar cálculos con Eigen
@@ -156,9 +161,23 @@ int main()
     Eigen::MatrixXd eigenvectores = solver.eigenvectors().real();
     Eigen::VectorXd eigenvalues = solver.eigenvalues().real();
 
+    for (size_t i = 0; i < eigenvectores.size(); i++)
+    {
+        cout << "eigenvectores: " << eigenvectores(i) << endl;
+    }
+
+    for (size_t i = 0; i < eigenvalues.size(); i++)
+    {
+        cout << "eigenvalues: " << eigenvalues(i) << endl;
+    }
+    
+    
+
     // Obtener matriz de componentes principales (normalizada x eigenvetores)
     // Eigen::MatrixXd compPrincipales = normalizada * eigenvectores;
 
+    
+    //----- relleno ----
     cout << "medias" << endl;
     for (int i = 0; i < columnas; i++)
     {
@@ -199,6 +218,41 @@ int main()
         }
         cout << endl;
     }
+
+    //-- SACANDO LA VARIANZA --
+    int mediana = filas / 2;
+    mediana = round(mediana);
+    cout << endl
+         << "mediana: " << mediana << endl;
+
+    double temp[filas];
+
+    for (size_t i = 0; i < columnas; i++)
+    {
+        for (size_t j = 0; j < filas; j++)
+        {
+            temp[j] = matriz[j][i];
+        }
+        sort(temp, temp + filas);
+        medianas[i] = temp[mediana];
+
+        cout << "temp" << endl;
+        for (size_t i = 0; i < filas; i++)
+        {
+            cout << temp[i] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << endl
+         << "medianas" << endl;
+    for (size_t i = 0; i < columnas; i++)
+    {
+        cout << endl
+             << medianas[i] << " ";
+    }
+
+
 
     archivo.close();
     return 0;
