@@ -8,15 +8,13 @@
 using Eigen::MatrixXd;
 using namespace std;
 
-void imprimirMatriz(const double *matriz, int filas, int columnas)
+void imprimirMatriz(double *matriz, int filas, int columnas)
 {
-
-    cout << endl;
-    for (int i = 0; i < filas; ++i)
+    for (int i = 0; i < filas; i++)
     {
-        for (int j = 0; j < columnas; ++j)
+        for (int j = 0; j < columnas; j++)
         {
-            cout << matriz[i * columnas + j] << " ";
+            cout << setw(7) << matriz[i * columnas + j];
         }
         cout << endl;
     }
@@ -104,6 +102,10 @@ int main()
         cout << endl;
     }
 
+    cout << endl
+         << "imprimiendo con funcion" << endl;
+    imprimirMatriz((double *)matriz, filas, columnas);
+
     // cout << endl << "Media[0]: " << media[0] << endl;
 
     // Calcular media y desv. estandar de cada variable
@@ -123,7 +125,7 @@ int main()
         desvEstandar[j] /= filas;
         cout << endl;
     }
-    // imprimirMatriz(&transpuesta[0][0], filas, columnas);
+    // imprimirMatriz((double *)transpuesta, columnas, filas);
 
     cout << endl
          << "Normalizada: " << endl;
@@ -170,13 +172,10 @@ int main()
     {
         cout << "eigenvalues: " << eigenvalues(i) << endl;
     }
-    
-    
 
     // Obtener matriz de componentes principales (normalizada x eigenvetores)
     // Eigen::MatrixXd compPrincipales = normalizada * eigenvectores;
 
-    
     //----- relleno ----
     cout << "medias" << endl;
     for (int i = 0; i < columnas; i++)
@@ -248,11 +247,24 @@ int main()
          << "medianas" << endl;
     for (size_t i = 0; i < columnas; i++)
     {
-        cout << endl
-             << medianas[i] << " ";
+        cout 
+             << medianas[i] << endl;
     }
 
+    Eigen::MatrixXd V(columnas, columnas); // Crear matriz V de tamaño m x m
 
+    // Llenar la matriz V con los vectores propios ordenados como columnas
+    for (int i = 0; i < columnas; ++i)
+    {
+        for (int j = 0; j < columnas; ++j)
+        {
+            V(j, i) = eigenvectores(j, i); // Seleccionar el i-ésimo vector propio y colocarlo como la columna i de V
+        }
+    }
+
+    // Imprimir la matriz V
+    cout << "Matriz V:" << endl;
+    cout << V << endl;
 
     archivo.close();
     return 0;
