@@ -102,30 +102,37 @@ int main()
         cout << endl;
     }
 
-    cout << endl
-         << "imprimiendo con funcion" << endl;
-    imprimirMatriz((double *)matriz, filas, columnas);
+    // cout << endl
+    //      << "imprimiendo con funcion" << endl;
+    // imprimirMatriz((double *)matriz, filas, columnas);
 
     // cout << endl << "Media[0]: " << media[0] << endl;
 
     // Calcular media y desv. estandar de cada variable
     // y obtener la transpuesta de la matriz original
+    cout << "Transpuesta: " << endl;
     double transpuesta[columnas][filas];
     cout << endl;
-    cout << "Transpuesta: " << endl;
     for (int j = 0; j < columnas; j++)
     {
         media[j] /= filas;
         for (int i = 0; i < filas; i++)
         {
             desvEstandar[j] += pow((matriz[j][i] - media[j]), 2);
-            transpuesta[i][j] = matriz[i][j];
-            cout << transpuesta[i][j] << " ";
+            transpuesta[j][i] = matriz[i][j];
+            cout << transpuesta[j][i] << " ";
         }
         desvEstandar[j] /= filas;
         cout << endl;
     }
+
+    
+    
     // imprimirMatriz((double *)transpuesta, columnas, filas);
+
+    // cout << endl << "prueba" << endl;
+    // imprimirMatriz((double *)matriz, filas, columnas);
+    
 
     cout << endl
          << "Normalizada: " << endl;
@@ -177,12 +184,12 @@ int main()
     // Eigen::MatrixXd compPrincipales = normalizada * eigenvectores;
 
     //----- relleno ----
-    cout << "medias" << endl;
-    for (int i = 0; i < columnas; i++)
-    {
-        cout << media[i] << " ";
-    }
-    cout << endl;
+    // cout << "medias" << endl;
+    // for (int i = 0; i < columnas; i++)
+    // {
+    //     cout << media[i] << " ";
+    // }
+    // cout << endl;
 
     cout << endl
          << "centrada (aca esta el error)" << endl;
@@ -192,17 +199,17 @@ int main()
         for (int j = 0; j < columnas; j++)
         {
             centrada[i][j] = matriz[i][j] - media[j];
-            // cout << centrada[i][j] << " ";
-            cout << setw(5) << matriz[i][j]; // aca esta el error
+            cout << setw(7) << centrada[i][j];
+            // cout << setw(5) << matriz[i][j]; // aca esta el error
         }
         cout << endl;
     }
 
-    cout << "desvEstandar" << endl;
-    for (int i = 0; i < columnas; i++)
-    {
-        cout << desvEstandar[i] << " ";
-    }
+    // cout << "desvEstandar" << endl;
+    // for (int i = 0; i < columnas; i++)
+    // {
+    //     cout << desvEstandar[i] << " ";
+    // }
     cout << endl
          << "reducida con desviacion estandar" << endl;
     double reducida[filas][columnas];
@@ -221,8 +228,8 @@ int main()
     //-- SACANDO LA VARIANZA --
     int mediana = filas / 2;
     mediana = round(mediana);
-    cout << endl
-         << "mediana: " << mediana << endl;
+    // cout << endl
+    //      << "mediana: " << mediana << endl;
 
     double temp[filas];
 
@@ -235,21 +242,21 @@ int main()
         sort(temp, temp + filas);
         medianas[i] = temp[mediana];
 
-        cout << "temp" << endl;
-        for (size_t i = 0; i < filas; i++)
-        {
-            cout << temp[i] << " ";
-        }
-        cout << endl;
+        // cout << "temp" << endl;
+        // for (size_t i = 0; i < filas; i++)
+        // {
+        //     cout << temp[i] << " ";
+        // }
+        // cout << endl;
     }
 
-    cout << endl
-         << "medianas" << endl;
-    for (size_t i = 0; i < columnas; i++)
-    {
-        cout
-            << medianas[i] << endl;
-    }
+    // cout << endl
+    //      << "medianas" << endl;
+    // for (size_t i = 0; i < columnas; i++)
+    // {
+    //     cout
+    //         << medianas[i] << endl;
+    // }
 
     Eigen::MatrixXd V(columnas, columnas); // Crear matriz V de tamaño m x m
 
