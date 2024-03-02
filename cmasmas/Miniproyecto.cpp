@@ -2,11 +2,10 @@
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <iomanip>
 #include "eigen-3.4.0/Eigen/Dense"
 #include "eigen-3.4.0/Eigen/Eigenvalues"
-#include <iomanip>
-
-using Eigen::Matrix3d;
+using Eigen::MatrixXd;
 using namespace std;
 
 void imprimirMatriz(const double *matriz, int filas, int columnas)
