@@ -64,6 +64,7 @@ int main()
     getline(archivo, linea);
 
     // Llenar la matriz de datos originales
+    cout << endl << "matriz base " << endl;
     double matriz[filas][columnas], media[columnas], desvEstandar[columnas];
     for (int i = 0; i < filas; i++)
     {
