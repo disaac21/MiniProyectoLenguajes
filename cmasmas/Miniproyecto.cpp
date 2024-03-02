@@ -283,8 +283,19 @@ int main()
     cout << C << endl;
 
     cout << "Paso 6:" << endl;
-    Eigen::MatrixXd Q = C * correlacion.transpose();
-    cout << "Matriz de calidades de individuos (Q):" << endl;
+    cout << "Matriz de calidades de individuos Q:" << endl;
+    Eigen::MatrixXd Q(filas, columnas); // Crear una matriz para almacenar el resultado
+    for (int i = 0; i < filas; ++i)
+    {
+        for (int j = 0; j < columnas; ++j)
+        {
+            Q(i, j) = 0;
+            for (int k = 0; k < columnas; ++k)
+            {
+                Q(i, j) += normalizada(i, k) * V(k, j); // Multiplicación de matrices manual
+            }
+        }
+    }
     cout << Q << endl;
 
     archivo.close();
