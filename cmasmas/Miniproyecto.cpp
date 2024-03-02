@@ -102,30 +102,37 @@ int main()
         cout << endl;
     }
 
-    cout << endl
-         << "imprimiendo con funcion" << endl;
-    imprimirMatriz((double *)matriz, filas, columnas);
+    // cout << endl
+    //      << "imprimiendo con funcion" << endl;
+    // imprimirMatriz((double *)matriz, filas, columnas);
 
     // cout << endl << "Media[0]: " << media[0] << endl;
 
     // Calcular media y desv. estandar de cada variable
     // y obtener la transpuesta de la matriz original
+    cout << "Transpuesta: " << endl;
     double transpuesta[columnas][filas];
     cout << endl;
-    cout << "Transpuesta: " << endl;
     for (int j = 0; j < columnas; j++)
     {
         media[j] /= filas;
         for (int i = 0; i < filas; i++)
         {
             desvEstandar[j] += pow((matriz[j][i] - media[j]), 2);
-            transpuesta[i][j] = matriz[i][j];
-            cout << transpuesta[i][j] << " ";
+            transpuesta[j][i] = matriz[i][j];
+            cout << transpuesta[j][i] << " ";
         }
         desvEstandar[j] /= filas;
         cout << endl;
     }
+
+    
+    
     // imprimirMatriz((double *)transpuesta, columnas, filas);
+
+    // cout << endl << "prueba" << endl;
+    // imprimirMatriz((double *)matriz, filas, columnas);
+    
 
     cout << endl
          << "Normalizada: " << endl;
@@ -151,7 +158,7 @@ int main()
         {
             correlacion(i, j) = 0.0;
             for (int k = 0; k < columnas; ++k)
-                correlacion(i, j) += matriz[i][k] * transpuesta[j][k];
+                correlacion(i, j) += (matriz[i][k] * transpuesta[j][k]);
             correlacion(i, j) /= filas;
             cout << setw(9) << correlacion(i, j);
         }
@@ -165,44 +172,44 @@ int main()
 
     for (size_t i = 0; i < eigenvectores.size(); i++)
     {
-        cout << "eigenvectores: " << eigenvectores(i) << endl;
+        // cout << "eigenvectores: " << eigenvectores(i) << endl;
     }
 
     for (size_t i = 0; i < eigenvalues.size(); i++)
     {
-        cout << "eigenvalues: " << eigenvalues(i) << endl;
+        // cout << "eigenvalues: " << eigenvalues(i) << endl;
     }
 
     // Obtener matriz de componentes principales (normalizada x eigenvetores)
     // Eigen::MatrixXd compPrincipales = normalizada * eigenvectores;
 
     //----- relleno ----
-    cout << "medias" << endl;
-    for (int i = 0; i < columnas; i++)
-    {
-        cout << media[i] << " ";
-    }
-    cout << endl;
+    // cout << "medias" << endl;
+    // for (int i = 0; i < columnas; i++)
+    // {
+    //     cout << media[i] << " ";
+    // }
+    // cout << endl;
 
     cout << endl
-         << "centrada" << endl;
+         << "centrada (aca esta el error)" << endl;
     double centrada[filas][columnas];
     for (int i = 0; i < filas; i++)
     {
         for (int j = 0; j < columnas; j++)
         {
             centrada[i][j] = matriz[i][j] - media[j];
-            // cout << centrada[i][j] << " ";
-            cout << setw(5) << matriz[i][j];
+            cout << setw(7) << centrada[i][j];
+            // cout << setw(5) << matriz[i][j]; // aca esta el error
         }
         cout << endl;
     }
 
-    cout << "desvEstandar" << endl;
-    for (int i = 0; i < columnas; i++)
-    {
-        cout << desvEstandar[i] << " ";
-    }
+    // cout << "desvEstandar" << endl;
+    // for (int i = 0; i < columnas; i++)
+    // {
+    //     cout << desvEstandar[i] << " ";
+    // }
     cout << endl
          << "reducida con desviacion estandar" << endl;
     double reducida[filas][columnas];
@@ -221,8 +228,8 @@ int main()
     //-- SACANDO LA VARIANZA --
     int mediana = filas / 2;
     mediana = round(mediana);
-    cout << endl
-         << "mediana: " << mediana << endl;
+    // cout << endl
+    //      << "mediana: " << mediana << endl;
 
     double temp[filas];
 
@@ -235,21 +242,21 @@ int main()
         sort(temp, temp + filas);
         medianas[i] = temp[mediana];
 
-        cout << "temp" << endl;
-        for (size_t i = 0; i < filas; i++)
-        {
-            cout << temp[i] << " ";
-        }
-        cout << endl;
+        // cout << "temp" << endl;
+        // for (size_t i = 0; i < filas; i++)
+        // {
+        //     cout << temp[i] << " ";
+        // }
+        // cout << endl;
     }
 
-    cout << endl
-         << "medianas" << endl;
-    for (size_t i = 0; i < columnas; i++)
-    {
-        cout
-            << medianas[i] << endl;
-    }
+    // cout << endl
+    //      << "medianas" << endl;
+    // for (size_t i = 0; i < columnas; i++)
+    // {
+    //     cout
+    //         << medianas[i] << endl;
+    // }
 
     Eigen::MatrixXd V(columnas, columnas); // Crear matriz V de tamaño m x m
 
@@ -350,5 +357,26 @@ int main()
     cout << endl;
 
     archivo.close();
+
+    //graficos
+    ofstream datos("datos.dat");
+    for (size_t i = 0; i < filas; ++i) {
+        for (size_t j = 0; j < filas; ++j) {
+            datos << i+1 << " " << j+1 << " " << correlacion(i,j) << endl;
+        }
+    }
+    datos.close();
+
+    ofstream script("grafico.gnu");
+    script << "set size ratio -1" << endl;
+    script << "set xrange [0:4]" << endl;
+    script << "set yrange [0:4]" << endl;
+    script << "set xlabel 'Variable 1'" << endl;
+    script << "set ylabel 'Variable 2'" << endl;
+    script << "plot 'datos.dat' using 1:2:(0.1):3 with circles lc var notitle" << endl;
+    script.close();
+
+    system("gnuplot -p grafico.gnu");
+    getchar();
     return 0;
 }
