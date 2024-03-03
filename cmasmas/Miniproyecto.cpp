@@ -353,27 +353,21 @@ int main()
     cout << endl;
 
     archivo.close();
-    /*
-    //graficos
-    ofstream datos("datos.dat");
-    for (size_t i = 0; i < filas; ++i) {
-        for (size_t j = 0; j < filas; ++j) {
-            datos << i+1 << " " << j+1 << " " << correlacion(i,j) << endl;
-        }
+    // Exportar los datos de interés a un archivo CSV desde C++
+    ofstream archivo_datos("datos.csv");
+
+    // Escribir los datos de las coordenadas de las variables en el archivo CSV
+    archivo_datos << "Variable,X,Y\n";
+    for (int i = 0; i < columnas; ++i) {
+        archivo_datos << "V" << i+1 << "," << T(i, 0) << "," << T(i, 1) << "\n";
     }
-    datos.close();
 
-    ofstream script("grafico.gnu");
-    script << "set size ratio -1" << endl;
-    script << "set xrange [0:4]" << endl;
-    script << "set yrange [0:4]" << endl;
-    script << "set xlabel 'Variable 1'" << endl;
-    script << "set ylabel 'Variable 2'" << endl;
-    script << "plot 'datos.dat' using 1:2:(0.1):3 with circles lc var notitle" << endl;
-    script.close();
+    // Escribir los datos de los vectores propios en el archivo CSV
+    archivo_datos << "Vector,X,Y\n";
+    for (int i = 0; i < columnas; ++i) {
+        archivo_datos << "V" << i+1 << "," << V(0, i) << "," << V(1, i) << "\n";
+    }
 
-    system("gnuplot -p grafico.gnu");
-    
-    getchar();*/
+    archivo_datos.close();
     return 0;
 }
