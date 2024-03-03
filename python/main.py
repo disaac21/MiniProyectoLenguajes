@@ -204,6 +204,14 @@ for i in range(len(OrdenadosValoresPropios)):
     print("Vector propio:", OrdenadosVectoresPropios[:, i])
     print()
 
+print("Matriz de Vectores Propios:")
+print(OrdenadosVectoresPropios)
+print()
+
+print("Matriz de Valores Propios:")
+print(OrdenadosValoresPropios)
+print()
+
 print("Paso 4 - Matriz V:")
 print(matrizV)
 print()
