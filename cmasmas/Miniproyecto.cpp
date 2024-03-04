@@ -1,373 +1,375 @@
 #include <iostream>
-#include <sstream>
 #include <fstream>
+#include <vector>
 #include <string>
-#include <iomanip>
+#include <sstream>
+#include <cmath>
+#include <algorithm>
 #include "eigen-3.4.0/Eigen/Dense"
-#include "eigen-3.4.0/Eigen/Eigenvalues"
-using Eigen::MatrixXd;
 using namespace std;
-
-void imprimirMatriz(double *matriz, int filas, int columnas)
-{
-    for (int i = 0; i < filas; i++)
-    {
-        for (int j = 0; j < columnas; j++)
-        {
-            cout << setw(7) << matriz[i * columnas + j];
-        }
-        cout << endl;
-    }
-}
-
-int main()
-{
-    cout << "Miniproyecto de Estadística" << endl;
-    // Primera lectura para obtener cantidad de columnas y de filas
-    string archivoCSV = "EjemploEstudiantes.csv", linea = "";
-    ifstream archivo(archivoCSV);
-
-    // Leemos la primera línea (encabezado)
-    getline(archivo, linea);
-    stringstream stream(linea);
-
-    string variable = "";
-    char delimitador = ';';
-    int columnas = 0, filas = 1;
-
-    getline(archivo, linea);
-
-    // Obtener la cantidad de variables (columnas)
-    // cout << linea << endl;
-    for (char c : linea)
-    {
-        if (c == ';')
-        {
-            columnas++;
-        }
-    }
-
-    // Obtener la cantidad de elementos (filas)
-    while (getline(archivo, linea))
-        filas++;
-    // while (getline(stream, variable, delimitador))
-    //     columnas++;
-
-    // Segunda lectura para obtener los datos
-    archivo.clear();
-    archivo.seekg(0, ios::beg);
-
-    // Omitir la primera línea (encabezado)
-    getline(archivo, linea);
-
-    // Llenar la matriz de datos originales
-    cout << endl
-         << "matriz base " << endl;
-    double matriz[filas][columnas], media[columnas], desvEstandar[columnas], medianas[columnas];
-    for (int i = 0; i < filas; i++)
-    {
-        getline(archivo, linea); // agarra toda la linea
-        stringstream filaStream(linea);
-        string valor = "";
-
-        // Omitir la primera columna (nombre del alumno)
-        getline(filaStream, valor, delimitador); // lee la linea que agarramos antes
-
-        // cout << "columnas: " << columnas << endl;
-
-        for (int j = 0; j < columnas; j++)
-        {
-            getline(filaStream, valor, delimitador);
-            for (char &c : valor)
-            {
-                // Replace ',' with '.'
-                if (c == ',')
-                {
-                    c = '.';
+vector<vector<double>> cargarArchivo(const string& filename) {
+    vector<vector<double>> matriz;
+    ifstream file(filename);
+    if (file.is_open()) {
+        string line;
+        getline(file, line);//leer primera linea
+        while (getline(file, line)) {
+            stringstream ss(line);
+            vector<double> fila;
+            string valor;
+            while (getline(ss, valor, ';')) {
+                // Reemplazar las comas por puntos
+                replace(valor.begin(), valor.end(), ',', '.');
+                try {
+                    fila.push_back(stod(valor));
+                } catch (const invalid_argument& e) {
+                    // Ignorar valores no numéricos
                 }
             }
-            try
-            {
-                matriz[i][j] = stod(valor);
-                media[j] += stod(valor);
-                // cout << endl << "media[" << j << "]: " << media[j] << " ";
-                cout << setw(5) << matriz[i][j];
-            }
-            catch (const std::invalid_argument &e)
-            {
-                // Handle invalid input
-                cout << "Invalid input: " << valor << endl;
-            }
+            matriz.push_back(fila);
         }
-        cout << endl;
+        file.close();
+    } else {
+        cerr << "No se pudo abrir el archivo: " << filename << endl;
     }
+    return matriz;
+}
 
-    // cout << endl
-    //      << "imprimiendo con funcion" << endl;
-    // imprimirMatriz((double *)matriz, filas, columnas);
-
-    // cout << endl << "Media[0]: " << media[0] << endl;
-
-    // Calcular media y desv. estandar de cada variable
-    // y obtener la transpuesta de la matriz original
-    double transpuesta[columnas][filas];
-    cout << endl;
-    cout << "Transpuesta: " << endl;
-    for (int j = 0; j < columnas; j++)
-    {
-        media[j] /= filas;
-        for (int i = 0; i < filas; i++)
-        {
-            desvEstandar[j] += pow((matriz[j][i] - media[j]), 2);
-            transpuesta[i][j] = matriz[i][j];
-            cout << transpuesta[i][j] << " ";
+// Función para calcular la media de cada columna de la matriz
+vector<double> calcMean(const vector<vector<double>>& matriz) {
+    int num_filas = matriz.size();
+    int num_columnas = matriz[0].size();
+    vector<double> medias(num_columnas, 0.0);
+    for (int j = 0; j < num_columnas; ++j) {
+        double suma_columna = 0.0;
+        for (int i = 0; i < num_filas; ++i) {
+            suma_columna += matriz[i][j];
         }
-        desvEstandar[j] /= filas;
-        cout << endl;
+        double media_columna = suma_columna / num_filas;
+        medias[j] = media_columna;
     }
-    // imprimirMatriz((double *)transpuesta, columnas, filas);
-    // cout << endl << "prueba" << endl;
-    // imprimirMatriz((double *)matriz, filas, columnas);
+    return medias;
+}
+
+// Función para calcular la desviación estándar de cada columna de la matriz
+vector<double> calcStdDev(const vector<vector<double>>& matriz) {
+    vector<double> meanColumnas = calcMean(matriz);
+    int num_filas = matriz.size();
+    int num_columnas = matriz[0].size();
+    vector<double> stdDeviations(num_columnas, 0.0);
+    for (int j = 0; j < num_columnas; ++j) {
+        double sumSquares = 0.0;
+        for (int i = 0; i < num_filas; ++i) {
+            sumSquares += pow((matriz[i][j] - meanColumnas[j]), 2);
+        }
+        double columns_StdDev = sqrt(sumSquares / num_filas);
+        stdDeviations[j] = columns_StdDev;
+    }
+    return stdDeviations;
+}
+
+// Función para centrar y reducir la matriz
+vector<vector<double>> centrarReducir(const vector<vector<double>>& matriz) {
+    vector<vector<double>> matrizCentradaReducida(matriz.size(), vector<double>(matriz[0].size(), 0.0));    
     
-
-     cout << endl
-         << "Normalizada: " << endl;
-    // Obtener matriz normalizada (centrada y reducida)
-    Eigen::MatrixXd normalizada(filas, columnas);
-    for (int i = 0; i < filas; i++)
-    {
-        for (int j = 0; j < columnas; j++)
-        {
-            normalizada(i, j) = (matriz[i][j] - media[i]) / desvEstandar[i];
-            cout << normalizada(i, j) << " ";
-        }
-        cout << endl;
-    }
-
-   // Obtener matriz de correlación
-    cout << endl
-         << "matriz de correlacion" << endl;
-    Eigen::MatrixXd correlacion(filas, filas);
-    for (int i = 0; i < filas; ++i)
-    {
-        for (int j = 0; j < filas; ++j)
-        {
-            correlacion(i, j) = 0.0;
-            for (int k = 0; k < columnas; ++k)
-                correlacion(i, j) += matriz[i][k] * transpuesta[j][k];
-            correlacion(i, j) /= filas;
-            cout << setw(9) << correlacion(i, j);
-        }
-        cout << endl;
-    }
-
-    // Realizar cálculos con Eigen
-    Eigen::EigenSolver<Eigen::MatrixXd> solver(correlacion);
-    Eigen::MatrixXd eigenvectores = solver.eigenvectors().real();
-    Eigen::VectorXd eigenvalues = solver.eigenvalues().real();
-
-    for (size_t i = 0; i < eigenvectores.size(); i++)
-    {
-        // cout << "eigenvectores: " << eigenvectores(i) << endl;
-    }
-
-    for (size_t i = 0; i < eigenvalues.size(); i++)
-    {
-        // cout << "eigenvalues: " << eigenvalues(i) << endl;
-    }
-
-    // Obtener matriz de componentes principales (normalizada x eigenvetores)
-    // Eigen::MatrixXd compPrincipales = normalizada * eigenvectores;
-
-    //----- relleno ----
-    // cout << "medias" << endl;
-    // for (int i = 0; i < columnas; i++)
-    // {
-    //     cout << media[i] << " ";
-    // }
-    // cout << endl;
-
-    cout << endl
-         << "centrada (aca esta el error)" << endl;
-    double centrada[filas][columnas];
-    for (int i = 0; i < filas; i++)
-    {
-        for (int j = 0; j < columnas; j++)
-        {
-            centrada[i][j] = matriz[i][j] - media[j];
-            cout << setw(7) << centrada[i][j];
-            // cout << setw(5) << matriz[i][j]; // aca esta el error
-        }
-        cout << endl;
-    }
-
-    // cout << "desvEstandar" << endl;
-    // for (int i = 0; i < columnas; i++)
-    // {
-    //     cout << desvEstandar[i] << " ";
-    // }
-    cout << endl
-         << "reducida con desviacion estandar" << endl;
-    double reducida[filas][columnas];
-    for (int i = 0; i < filas; i++)
-    {
-        for (int j = 0; j < columnas; j++)
-        {
-            reducida[i][j] = centrada[i][j] / desvEstandar[j];
-            cout << setw(11) << reducida[i][j] << " ";
-            // cout << centrada[i][j] << " ";
-            // cout << setw(5) << matriz[i][j];
-        }
-        cout << endl;
-    }
-
-    //-- SACANDO LA VARIANZA --
-    int mediana = filas / 2;
-    mediana = round(mediana);
-    // cout << endl
-    //      << "mediana: " << mediana << endl;
-
-    double temp[filas];
-
-    for (size_t i = 0; i < columnas; i++)
-    {
-        for (size_t j = 0; j < filas; j++)
-        {
-            temp[j] = matriz[j][i];
-        }
-        sort(temp, temp + filas);
-        medianas[i] = temp[mediana];
-
-        // cout << "temp" << endl;
-        // for (size_t i = 0; i < filas; i++)
-        // {
-        //     cout << temp[i] << " ";
-        // }
-        // cout << endl;
-    }
-
-    // cout << endl
-    //      << "medianas" << endl;
-    // for (size_t i = 0; i < columnas; i++)
-    // {
-    //     cout
-    //         << medianas[i] << endl;
-    // }
-
-    Eigen::MatrixXd V(columnas, columnas); // Crear matriz V de tamaño m x m
-
-    // Llenar la matriz V con los vectores propios ordenados como columnas
-    for (int i = 0; i < columnas; ++i)
-    {
-        for (int j = 0; j < columnas; ++j)
-        {
-            V(j, i) = eigenvectores(j, i); // Seleccionar el i-ésimo vector propio y colocarlo como la columna i de V
+    vector<double> means = calcMean(matriz);
+    vector<double> stdDeviations = calcStdDev(matriz);
+    for (size_t i = 0; i < matriz.size(); ++i) {
+        for (size_t j = 0; j < matriz[i].size(); ++j) {
+            matrizCentradaReducida[i][j] = (matriz[i][j] - means[j]) / stdDeviations[j];
         }
     }
+    return matrizCentradaReducida;
+}
+double calcCorrelaciones(const vector<double>& columnOne, const vector<double>& columnTwo) {
+    double meansOne = 0.0;
+    double meansTwo = 0.0;
+    for (double val : columnOne) {
+        meansOne += val;
+    }
+    meansOne /= columnOne.size();
+    for (double val : columnTwo) {
+        meansTwo += val;
+    }
+    meansTwo /= columnTwo.size();
 
-    // Imprimir la matriz V
-    cout << "Paso 4:" << endl;
-    cout << V << endl;
+    double numerador = 0.0;
+    for (size_t i = 0; i < columnOne.size(); ++i) {
+        numerador += (columnOne[i] - meansOne) * (columnTwo[i] - meansTwo);
+    }
 
-    cout << "Paso 5:" << endl;
-    Eigen::MatrixXd C(filas, columnas);
+    double denominador = 0.0;
+    for (double val : columnOne) {
+        denominador += pow((val - meansOne), 2);
+    }
+    denominador = sqrt(denominador) * sqrt(columnTwo.size());
 
-    for (int i = 0; i < filas; ++i)
-    {
-        for (int j = 0; j < columnas; ++j)
-        {
-            C(i, j) = 0;
-            for (int k = 0; k < columnas; ++k)
-            {
-                C(i, j) += normalizada(i, k) * V(k, j);
+    double correlacionSend = numerador / denominador;
+    return correlacionSend;
+}
+vector<double> getColumn(const vector<vector<double>>& matriz, int j) {
+    vector<double> columna;
+    for (size_t i = 0; i < matriz.size(); ++i) {
+        columna.push_back(matriz[i][j]);
+    }
+    return columna;
+}
+vector<vector<double>> calcMatrizCorrelaciones(const vector<vector<double>>& matrizCentradaReducida) {
+    int n = matrizCentradaReducida[0].size();
+    vector<vector<double>> matrizCorrelaciones(n, vector<double>(n, 0.0));
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            double r = calcCorrelaciones(getColumn(matrizCentradaReducida, i), getColumn(matrizCentradaReducida, j));
+            matrizCorrelaciones[i][j] = r;
+        }
+    }
+    return matrizCorrelaciones;
+}
+vector<double> calcValoresPropios(const vector<vector<double>>& matrizCorrelaciones) {
+    Eigen::MatrixXd matrizCorrelacionesEigen(matrizCorrelaciones.size(), matrizCorrelaciones[0].size());
+    for (size_t i = 0; i < matrizCorrelaciones.size(); ++i) {
+        for (size_t j = 0; j < matrizCorrelaciones[i].size(); ++j) {
+            matrizCorrelacionesEigen(i, j) = matrizCorrelaciones[i][j];
+        }
+    }
+    Eigen::EigenSolver<Eigen::MatrixXd> solver(matrizCorrelacionesEigen);
+    Eigen::VectorXd valoresPropios = solver.eigenvalues().real();
+
+    vector<double> valoresPropiosVec(valoresPropios.size());
+    for (int i = 0; i < valoresPropios.size(); ++i) {
+        valoresPropiosVec[i] = valoresPropios(i);
+    }
+    return valoresPropiosVec;
+}
+vector<vector<double>> calcVectoresPropios(const vector<vector<double>>& matrizCorrelaciones) {
+    Eigen::MatrixXd matrizCorrelacionesEigen(matrizCorrelaciones.size(), matrizCorrelaciones[0].size());
+    for (size_t i = 0; i < matrizCorrelaciones.size(); ++i) {
+        for (size_t j = 0; j < matrizCorrelaciones[i].size(); ++j) {
+            matrizCorrelacionesEigen(i, j) = matrizCorrelaciones[i][j];
+        }
+    }
+    Eigen::EigenSolver<Eigen::MatrixXd> solver(matrizCorrelacionesEigen);
+    Eigen::MatrixXd vectoresPropios = solver.eigenvectors().real();
+
+    vector<vector<double>> vectoresPropiosVec(matrizCorrelaciones.size(), vector<double>(matrizCorrelaciones[0].size()));
+    for (size_t i = 0; i < matrizCorrelaciones.size(); ++i) {
+        for (size_t j = 0; j < matrizCorrelaciones[i].size(); ++j) {
+            vectoresPropiosVec[i][j] = vectoresPropios(i, j);
+        }
+    }
+    return vectoresPropiosVec;
+}
+
+vector<double> orderValoresPropios(vector<double> valoresPropios) {
+    for (size_t i = 0; i < valoresPropios.size(); ++i) {
+        for (size_t j = i + 1; j < valoresPropios.size(); ++j) {
+            if (valoresPropios[i] < valoresPropios[j]) {
+                swap(valoresPropios[i], valoresPropios[j]);
             }
         }
     }
-    cout << C << endl;
+    return valoresPropios;
+}
 
-    cout << "Paso 6:" << endl;
-    cout << "Matriz de calidades de individuos Q:" << endl;
-    Eigen::MatrixXd Q(filas, columnas); // Crear una matriz para almacenar el resultado
-    for (int i = 0; i < filas; ++i)
-    {
-        for (int j = 0; j < columnas; ++j)
-        {
-            Q(i, j) = 0;
-            for (int k = 0; k < columnas; ++k)
-            {
-                Q(i, j) += normalizada(i, k) * V(k, j); // Multiplicación de matrices manual
+vector<vector<double>> orderVectoresPropios(const vector<vector<double>>& vectoresPropios, const vector<double>& orderedValoresPropios) {
+    vector<int> indexes(orderedValoresPropios.size());
+    for (size_t i = 0; i < indexes.size(); ++i) {
+        indexes[i] = i;
+    }
+    sort(indexes.begin(), indexes.end(), [&](int a, int b) {
+        return orderedValoresPropios[a] > orderedValoresPropios[b];
+    });
+
+    vector<vector<double>> orderedVectoresPropios(vectoresPropios.size(), vector<double>(vectoresPropios[0].size()));
+    for (size_t i = 0; i < vectoresPropios.size(); ++i) {
+        for (size_t j = 0; j < vectoresPropios[i].size(); ++j) {
+            orderedVectoresPropios[i][j] = vectoresPropios[i][indexes[j]];
+        }
+    }
+    return orderedVectoresPropios;
+}
+vector<vector<double>> calcMatrizComponentesPrincipales(const vector<vector<double>>& centradaReducida, const vector<vector<double>>& matrizV) {
+    int filas_CR = centradaReducida.size();
+    int columnas_CR = centradaReducida[0].size();
+    int filas_V = matrizV.size();
+    int columnas_V = matrizV[0].size();
+
+    vector<vector<double>> matrizComponentesPrincipalesTemp(filas_CR, vector<double>(columnas_V, 0.0));
+
+    for (int i = 0; i < filas_CR; ++i) {
+        for (int j = 0; j < columnas_V; ++j) {
+            for (int k = 0; k < columnas_CR; ++k) {
+                matrizComponentesPrincipalesTemp[i][j] += centradaReducida[i][k] * matrizV[k][j];
             }
         }
     }
-    cout << Q << endl;
 
-    // Paso 7: Calcular la matriz de coordenadas de las variables T
-    cout << "Paso 7 :" << endl;
-    cout << "Matriz de coordenadas de las variables T :" << endl;
-    Eigen::MatrixXd T(filas, columnas); // Crear una matriz para almacenar el resultado
-
-    // Multiplicación de la matriz normalizada por los vectores propios
-    for (int i = 0; i < filas; ++i)
-    {
-        for (int j = 0; j < columnas; ++j)
-        {
-            T(i, j) = 0;
-            for (int k = 0; k < columnas; ++k)
-            {
-                T(i, j) += normalizada(i, k) * V(k, j); // Calcular la matriz de coordenadas de las variables T
+    vector<vector<double>> matrizComponentesPrincipales(filas_CR, vector<double>(2, 0.0));
+    for (int i = 0; i < filas_CR; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            matrizComponentesPrincipales[i][j] = matrizComponentesPrincipalesTemp[i][j];
+        }
+    }
+    return matrizComponentesPrincipales;
+}
+vector<vector<double>> calcMatrizCalidadesIndividuos(const vector<vector<double>>& matrizComponentesPrincipales, const vector<vector<double>>& matrizCentradaReducida) {
+    vector<vector<double>> listaMatrizCalidadesIndividuos;
+    int rowCount = matrizComponentesPrincipales.size();
+    int columnCount = matrizComponentesPrincipales[0].size();
+    
+    for (int i = 0; i < rowCount; ++i) {
+        vector<double> fila;
+        for (int j = 0; j < columnCount; ++j) {
+            double num = pow(matrizComponentesPrincipales[i][j], 2);
+            double den = 0.0;
+            for (int k = 0; k < columnCount; ++k) {
+                den += pow(matrizCentradaReducida[i][k], 2);
             }
+            fila.push_back(num / den);
         }
+        listaMatrizCalidadesIndividuos.push_back(fila);
     }
-    cout << T << endl;
-    cout << "Paso 8:" << endl;
-    cout << "Matriz de calidades de las variables S:" << endl;
-    Eigen::MatrixXd S(columnas, columnas);
+    
+    return listaMatrizCalidadesIndividuos;
+}
+vector<vector<double>> calcMatrizCoordenadasVariables(const vector<vector<double>>& centradaReducida, const vector<vector<double>>& vectoresPropios) {
+    int rowCount = centradaReducida.size();
+    int columnCount = vectoresPropios[0].size();
 
-    for (int i = 0; i < columnas; ++i)
-    {
-        for (int j = 0; j < columnas; ++j)
-        {
-            S(i, j) = 0;
-            for (int k = 0; k < filas; ++k)
-            {
-                S(i, j) += pow(C(k, i), 2);
-            }
-            S(i, j) /= filas;
-            cout << setw(9) << S(i, j);
+    Eigen::MatrixXd centradaReducidaEigen(rowCount, centradaReducida[0].size());
+    for (int i = 0; i < rowCount; ++i) {
+        for (int j = 0; j < centradaReducida[i].size(); ++j) {
+            centradaReducidaEigen(i, j) = centradaReducida[i][j];
         }
-        cout << endl;
     }
-    cout << "Vector de inercias de los ejes I:" << endl;
-    Eigen::MatrixXd I(1, columnas);
 
-    for (int j = 0; j < columnas; ++j)
-    {
-        double suma = 0;
-        for (int i = 0; i < columnas; ++i)
-        {
-            suma += S(i, j);
+    Eigen::MatrixXd vectoresPropiosEigen(vectoresPropios.size(), vectoresPropios[0].size());
+    for (int i = 0; i < vectoresPropios.size(); ++i) {
+        for (int j = 0; j < vectoresPropios[i].size(); ++j) {
+            vectoresPropiosEigen(i, j) = vectoresPropios[i][j];
         }
-        I(0, j) = suma;
-        cout << setw(9) << I(0, j);
     }
+
+    Eigen::MatrixXd matrizCoordenadasVariablesEigen = centradaReducidaEigen * vectoresPropiosEigen.transpose();
+
+    vector<vector<double>> matrizCoordenadasVariables(rowCount, vector<double>(columnCount));
+    for (int i = 0; i < rowCount; ++i) {
+        for (int j = 0; j < columnCount; ++j) {
+            matrizCoordenadasVariables[i][j] = matrizCoordenadasVariablesEigen(i, j);
+        }
+    }
+
+    return matrizCoordenadasVariables;
+}
+vector<double> calcMatrizCalidadesVariables(const vector<double>& valoresPropios, int entries) {
+    vector<double> matrizCalidadesVariables(valoresPropios.size());
+    for (size_t i = 0; i < valoresPropios.size(); ++i) {
+        matrizCalidadesVariables[i] = valoresPropios[i] / entries;
+    }
+    return matrizCalidadesVariables;
+}
+vector<double> calcVectorInerciasEjes(const vector<double>& valoresPropios) {
+    vector<double> vectorInerciasEjes;
+    int den = valoresPropios.size();
+    for (size_t i = 0; i < valoresPropios.size(); ++i) {
+        double num = valoresPropios[i] * 100.0;
+        double value = num / den;
+        vectorInerciasEjes.push_back(value);
+    }
+    return vectorInerciasEjes;
+}
+// Función para imprimir un vector
+void imprimirVector(const vector<double>& vector) {
+    cout << "[";
+    for (const auto& elemento : vector) {
+        cout << "["<< elemento << "] ";
+    }
+    cout << "]" << endl;
     cout << endl;
-
-    archivo.close();
-    // Exportar los datos de interés a un archivo CSV desde C++
-    ofstream archivo_datos("datos.csv");
-
-    // Escribir los datos de las coordenadas de las variables en el archivo CSV
-    archivo_datos << "Variable,X,Y\n";
-    for (int i = 0; i < columnas; ++i) {
-        archivo_datos << "V" << i+1 << "," << T(i, 0) << "," << T(i, 1) << "\n";
+}
+void imprimirMatriz(const vector<vector<double>>& matriz) {
+    cout << "[";
+    for (const auto& fila : matriz) {
+        for (const auto& elemento : fila) {
+            cout << "["<< elemento << "] ";
+        }
+        cout << endl;
     }
-
-    // Escribir los datos de los vectores propios en el archivo CSV
-    archivo_datos << "Vector,X,Y\n";
-    for (int i = 0; i < columnas; ++i) {
-        archivo_datos << "V" << i+1 << "," << V(0, i) << "," << V(1, i) << "\n";
+    cout << "]" << endl;
+}
+void imprimirParesValores(const vector<double>& valoresPropios, const vector<std::vector<double>>& vectoresPropios) {
+    for (size_t i = 0; i < valoresPropios.size(); ++i) {
+        cout << "Valor propio: " << valoresPropios[i] << std::endl;
+        cout << "Vector propio: ";
+        for (size_t j = 0; j < vectoresPropios.size(); ++j) {
+            cout << vectoresPropios[j][i] << " ";
+        }
+        cout << endl << endl;
     }
+}
+int main() {
+    // Nombre del archivo
+    const string filename = "EjemploEstudiantes.csv";
 
-    archivo_datos.close();
+    // Cargar archivo y crear matriz
+    vector<vector<double>> matrizRaw = cargarArchivo(filename);
+    
+    // Centrar y reducir
+    vector<vector<double>> matrizCentradaReducida = centrarReducir(matrizRaw);
+    
+    // Cálculo de matriz de correlaciones
+    vector<vector<double>> matrizCorrelaciones = calcMatrizCorrelaciones(matrizCentradaReducida);
+    
+    // Cálculo de valores y vectores propios
+    vector<double> valoresPropios = calcValoresPropios(matrizCorrelaciones);
+    vector<vector<double>> vectoresPropios = calcVectoresPropios(matrizCorrelaciones);
+    
+    // Ordenamiento de valores y vectores propios
+    vector<double> ordenadosValoresPropios = orderValoresPropios(valoresPropios);
+    vector<vector<double>> ordenadosVectoresPropios = orderVectoresPropios(vectoresPropios, ordenadosValoresPropios);
+    
+    // Construcción de matriz V
+    vector<vector<double>> matrizV = ordenadosVectoresPropios;
+    
+    // Cálculo de matriz de componentes principales
+    vector<vector<double>> matrizComponentesPrincipales = calcMatrizComponentesPrincipales(matrizCentradaReducida, matrizV);
+    
+    // Cálculo de matriz de calidades de individuos
+    vector<vector<double>> matrizCalidadesIndividuos = calcMatrizCalidadesIndividuos(matrizComponentesPrincipales, matrizCentradaReducida);
+    
+    // Cálculo de matriz de coordenadas de las variables
+    vector<vector<double>> matrizCoordenadasVariables = calcMatrizCoordenadasVariables(matrizCentradaReducida, ordenadosVectoresPropios);
+    
+    // Cálculo de matriz de calidades de las variables
+    vector<double> matrizCalidadesVariables = calcMatrizCalidadesVariables(ordenadosValoresPropios, matrizCentradaReducida.size());
+    
+    // Cálculo de vector de inercias de los ejes
+    vector<double> vectorInerciasEjes = calcVectorInerciasEjes(ordenadosValoresPropios);
+
+
+    // Salida de resultados
+    cout << "\nPaso 1 - Matriz Centrada y Reducida:\n";
+    imprimirMatriz(matrizCentradaReducida);
+    cout << "\nPaso 2 - Matriz de Correlaciones:\n";
+    imprimirMatriz(matrizCorrelaciones);
+    cout << "\nPaso 3 - Valores y Vectores Propios:\n";
+    imprimirParesValores(ordenadosValoresPropios, ordenadosVectoresPropios);
+    cout << "Matriz de Vectores Propios:\n";
+    imprimirMatriz(ordenadosVectoresPropios);
+    cout << "Matriz de Valores Propios:\n";
+    imprimirVector(ordenadosValoresPropios);
+    cout << "\nPaso 4 - Matriz V:\n";
+    imprimirMatriz(matrizV);
+    cout << "\nPaso 5 - Matriz de Componentes Principales:\n";
+    imprimirMatriz(matrizComponentesPrincipales);
+    cout << "\nPaso 6 - Matriz de Calidades de Individuos:\n";
+    imprimirMatriz(matrizCalidadesIndividuos);
+    cout << "\nPaso 7 - Matriz de Coordenadas de las Variables:\n";
+    imprimirMatriz(matrizCoordenadasVariables);
+    cout << "\nPaso 8 - Matriz de Calidades de las Variables:\n";
+    imprimirVector(matrizCalidadesVariables);
+    cout << "\nPaso 9 - Vector de Inercias de los Ejes:\n";
+    imprimirVector(vectorInerciasEjes);
+
     return 0;
 }

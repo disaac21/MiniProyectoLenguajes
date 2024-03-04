@@ -159,7 +159,6 @@ def fileNames(filename):
 #Cargar Archivo y Crear Matriz
 filename = 'EjemploEstudiantes.csv'
 matrizRaw = cargarArchivo(filename)
-
 #Centrar y Reducir
 matrizCentradaReducida = centrarReducir(matrizRaw) 
 
